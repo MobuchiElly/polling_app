@@ -65,11 +65,14 @@ export default function PollPage({ params }: { params: Promise<{ id: string }> }
               </Button>
             </>
           ) : (
-            <div className="text-center">
+            <div className="text-center relative">
               <p className="text-lg font-semibold">Thanks for voting!</p>
               <p className="text-gray-500 mt-2">
                 You voted for: <span className="font-bold">{selectedOption}</span>
               </p>
+              <Button onClick={() => window.location.href = '/polls'} variant="outline" className="mt-4">
+                Back to Polls
+              </Button>
             </div>
           )}
         </CardContent>
