@@ -5,4 +5,4 @@ import {registerSchema} from "@/schemas/auth";
 type LoginFormData = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export {LoginFormData, RegisterFormValues};
+export type {LoginFormData, RegisterFormValues};

@@ -44,12 +44,11 @@ export function RegisterForm() {
 
       if (error) {
         console.error("Registration error:", error.message);
-        // You might want to display an error message to the user here
-        // e.g., using a simple alert or a custom toast/notification system
+        // error notification to be implemeneted
         alert(`Registration failed: ${error.message}`);
       } else {
         alert("Registration successful! Please check your email for a confirmation link.");
-        router.push("/auth/login"); // Redirect to login after successful registration
+        router.push("/auth/login");
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
