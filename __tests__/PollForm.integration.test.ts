@@ -9,8 +9,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 // Replace with the test user's credentials
-const TEST_USER_EMAIL = "ugwueleazer@gmail.com";
-const TEST_USER_PASSWORD = "adminsecret";
+const TEST_USER_EMAIL = process.env.NEXT_PUBLIC_TEST_EMAIL;
+const TEST_USER_PASSWORD = process.env.NEXT_PUBLIC_TEST_PASSWORD;
 
 // Test tables
 const POLLS_TABLE = "test_polls";
