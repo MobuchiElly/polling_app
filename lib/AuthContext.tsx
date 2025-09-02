@@ -4,16 +4,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { createClient, User, AuthError, Session } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Ensure environment variables are defined at runtime
-if (!supabaseUrl) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
-}
-if (!supabaseAnonKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
-}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -31,7 +24,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("user:", user);
       setUser(session?.user || null);
     });
 
@@ -48,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      console.error('Sign-in error:', error.message);
+      const errMessage = error.message.split(":")[1] || "";
+      console.log('Sign-in error:', errMessage);
     }
     setUser(data.user);
     return { user: data.user, session: data.session, error };
@@ -62,7 +55,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback` 
     }});
     if (error) {
-      console.error('Sign-up error:', error.message);
+      const errMessage = error.message.split(":")[1] || "";
+      console.log('Sign-in error:', errMessage);
     }
     setUser(data.user);
     return { user: data.user, session: data.session, error };
@@ -71,7 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Sign-out error:', error.message);
+      const errMessage = error.message.split(":")[1] || "";
+      console.log('Sign-in error:', errMessage);
     }
     setUser(null);
     return { error };

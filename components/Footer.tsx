@@ -4,4 +4,4 @@ export default function Footer() {
       &copy; {new Date().getFullYear()} PollApp. All rights reserved.
     </footer>
   );
-}
+};

@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     "lib/supabaseClient.env",
     "app/polls/[id]/page.env"
-  ],
+, "__tests__/integration/PollFomr", "__tests__/PollForm.unit.test.env", "__tests__/PollForm.integration.test.ts"  ],
   "exclude": [
     "node_modules"
   ]

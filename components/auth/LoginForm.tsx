@@ -13,11 +13,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/lib/AuthContext";
 import { loginSchema } from "@/schemas/auth";
 import { LoginFormData } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
+  const router = useRouter();
 
   const {
     register,
@@ -32,15 +34,19 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await signIn(data.email, data.password);
-      // success notification goes here
-    } catch (error) {
-      const errorMessage =
+      const {session, error} = await signIn(data.email, data.password);
+      if(error){
+        const errorMessage =
         error instanceof Error ? error.message : "An unexpected error occurred";
-      setError("root", {
+        setError("root", {
         type: "manual",
         message: errorMessage,
       });
+        return;
+      }
+      router.push("/polls");
+    } catch(error){
+      console.log("An unexpected error occurred:", error);
     } finally {
       setIsLoading(false);
     }

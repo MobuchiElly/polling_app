@@ -3,12 +3,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -41,17 +39,13 @@ export function RegisterForm() {
     setIsLoading(true);
     try {
       const { error } = await signUp(values.email, values.password);
-
       if (error) {
-        console.error("Registration error:", error.message);
-        // error notification to be implemeneted
         alert(`Registration failed: ${error.message}`);
-      } else {
-        alert("Registration successful! Please check your email for a confirmation link.");
-        router.push("/auth/login");
+        return;
       }
+      alert("Registration successful! Please check your email for a confirmation link.");
     } catch (error) {
-      console.error("An unexpected error occurred:", error);
+      console.log("An unexpected error occurred:", error);
       alert("An unexpected error occurred during registration.");
     } finally {
       setIsLoading(false);
