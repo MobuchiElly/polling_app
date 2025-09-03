@@ -47,7 +47,7 @@ export default function PollsDashboard() {
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Polls</h1>
-        <Link href={user ? "/polls/create" : "/auth/login"}>
+        <Link href={user ? "/polls/new" : "/auth/login"}>
           <Button>Create New Poll</Button>
         </Link>
       </div>

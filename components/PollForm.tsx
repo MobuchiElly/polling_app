@@ -39,18 +39,29 @@ export default function PollForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || options.some((opt) => !opt.trim())) {
-      setError("Poll title and all options are required!");
+    setLoading(true);
+    setError(""); // Clear previous errors
+
+    // Input validation
+    if (!title.trim()) {
+      setError("Poll title is required!");
+      setLoading(false);
       return;
     }
-    setLoading(true);
+
+    if (options.some((opt) => !opt.trim())) {
+      setError("All poll options are required!");
+      setLoading(false);
+      return;
+    }
+
+    if (!user) {
+      setError("You must be logged in to create a poll.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      if (!user) {
-        setError("You must be logged in to create a poll.");
-        return;
-      }
-
       // 1. Insert poll
       const { data: poll, error: pollError } = await supabase
         .from("polls")
@@ -58,7 +69,9 @@ export default function PollForm() {
         .select()
         .single();
 
-      if (pollError) throw pollError;
+      if (pollError) {
+        throw pollError;
+      }
 
       // 2. Insert poll options
       const formattedOptions = options.map((text) => ({
@@ -70,13 +83,15 @@ export default function PollForm() {
         .from("poll_options")
         .insert(formattedOptions);
 
-      if (optionsError) throw optionsError;
+      if (optionsError) {
+        throw optionsError;
+      }
 
       // Redirect
       router.push(`/polls/${poll.id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating poll:", err);
-      setError("Something went wrong creating the poll. Please try again.");
+      setError(err.message || "Something went wrong creating the poll. Please try again.");
     } finally {
       setLoading(false);
     }
