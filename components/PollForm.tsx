@@ -3,58 +3,136 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import {useAuth} from "@/lib/AuthContext";
+import { useAuth } from "@/lib/AuthContext";
 
-
+/**
+ * PollForm Component
+ *
+ * This component renders a form that allows authenticated users to create a new poll.
+ * It handles:
+ *  - Poll question and description input
+ *  - Dynamic poll options management (add/remove/change)
+ *  - Validation before submission
+ *  - Saving poll and options into the Supabase database
+ *  - Redirecting to the poll’s detail page upon successful creation
+ *
+ * Why it’s needed:
+ * This is the core entry point for user-generated content in the app. Without this,
+ * there is no way to create polls, making it central to the app’s functionality.
+ *
+ * Assumptions:
+ * - The user must be authenticated (checked via AuthContext).
+ * - Supabase tables `polls` and `poll_options` exist and have the expected schema.
+ * - A poll must have at least 2 non-empty options.
+ *
+ * Edge Cases:
+ * - If the user is not logged in → auto-redirects to `/auth/login`.
+ * - If fewer than 2 options exist, the last remove attempt is ignored.
+ * - Handles Supabase errors gracefully and displays them to the user.
+ */
 export default function PollForm() {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [options, setOptions] = useState<string[]>(["", ""]);
+  const [options, setOptions] = useState<string[]>(["", ""]); // Always start with 2 options
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
+  /**
+   * Effect: Redirect unauthenticated users
+   *
+   * Why: Poll creation should only be possible for logged-in users.
+   * This avoids invalid data (polls without an owner).
+   */
   useEffect(() => {
-   if(!user){
-    return router.push("/auth/login");
-   }
+    if (!user) {
+      return router.push("/auth/login");
+    }
   }, [user, router]);
-  
+
+  /**
+   * handleOptionChange
+   *
+   * Updates a specific poll option when the user types into its input field.
+   *
+   * Why: Ensures controlled input state so React keeps the form data in sync.
+   *
+   * @param index - Index of the option being modified
+   * @param value - New string value entered by the user
+   */
   const handleOptionChange = (index: number, value: string) => {
     const updated = [...options];
     updated[index] = value;
     setOptions(updated);
   };
 
+  /**
+   * addOption
+   *
+   * Adds a new empty option field.
+   *
+   * Why: Gives users flexibility to add more than the default 2 options.
+   * Assumption: The database supports any reasonable number of options.
+   */
   const addOption = () => {
     setOptions([...options, ""]);
   };
 
+  /**
+   * removeOption
+   *
+   * Removes an option field at the given index.
+   *
+   * Why: Users may want to reduce choices after adding extra ones.
+   * Edge case: Prevents removing below 2 options (minimum requirement for a poll).
+   *
+   * @param index - Index of the option to remove
+   */
   const removeOption = (index: number) => {
-    if (options.length <= 2) return; // require at least 2 options
+    if (options.length <= 2) return; // Enforce minimum of 2 options
     setOptions(options.filter((_, i) => i !== index));
   };
 
+  /**
+   * handleSubmit
+   *
+   * Handles form submission: validates input, creates poll in Supabase,
+   * inserts its options, then redirects to the new poll page.
+   *
+   * Why: Central logic that bridges the UI form with backend persistence.
+   *
+   * Assumptions:
+   * - Supabase `polls` table has `question` and `creator_id` columns.
+   * - Supabase `poll_options` table has `option_text` and `poll_id` columns.
+   *
+   * Edge Cases:
+   * - Empty title → shows error message.
+   * - Any blank option → shows error message.
+   * - Database/network error → shows user-friendly error message.
+   *
+   * @param e - React form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(""); // Clear previous errors
 
-    // Input validation
+    // Validate poll title
     if (!title.trim()) {
       setError("Poll title is required!");
       setLoading(false);
       return;
     }
 
+    // Validate poll options
     if (options.some((opt) => !opt.trim())) {
       setError("All poll options are required!");
       setLoading(false);
       return;
     }
 
+    // Double-check user auth
     if (!user) {
       setError("You must be logged in to create a poll.");
       setLoading(false);
@@ -69,11 +147,9 @@ export default function PollForm() {
         .select()
         .single();
 
-      if (pollError) {
-        throw pollError;
-      }
+      if (pollError) throw pollError;
 
-      // 2. Insert poll options
+      // 2. Insert poll options (linked via poll.id foreign key)
       const formattedOptions = options.map((text) => ({
         option_text: text,
         poll_id: poll.id,
@@ -83,124 +159,152 @@ export default function PollForm() {
         .from("poll_options")
         .insert(formattedOptions);
 
-      if (optionsError) {
-        throw optionsError;
-      }
+      if (optionsError) throw optionsError;
 
-      // Redirect
+      // 3. Redirect to the newly created poll page
       router.push(`/polls/${poll.id}`);
     } catch (err: any) {
       console.error("Error creating poll:", err);
-      setError(err.message || "Something went wrong creating the poll. Please try again.");
+      setError(
+        err.message || "Something went wrong creating the poll. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-              <div className="ml-auto pl-3">
-                <div className="-mx-1.5 -my-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setError("")}
-                    className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none"
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              {/* Error Icon */}
+              <svg
+                className="h-5 w-5 text-red-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 
+                  1.414L8.586 10l-1.293 1.293a1 1 0 
+                  101.414 1.414L10 11.414l1.293 
+                  1.293a1 1 0 001.414-1.414L11.414 
+                  10l1.293-1.293a1 1 0 
+                  00-1.414-1.414L10 8.586 
+                  8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+            {/* Dismiss Button */}
+            <div className="ml-auto pl-3">
+              <div className="-mx-1.5 -my-1.5">
+                <button
+                  type="button"
+                  onClick={() => setError("")}
+                  className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none"
+                >
+                  <span className="sr-only">Dismiss</span>
+                  <svg
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    <span className="sr-only">Dismiss</span>
-                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 
+                      0L10 8.586l4.293-4.293a1 1 0 
+                      111.414 1.414L11.414 10l4.293 
+                      4.293a1 1 0 01-1.414 1.414L10 
+                      11.414l-4.293 4.293a1 1 0 
+                      01-1.414-1.414L8.586 10 4.293 
+                      5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Poll Title */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Poll Question
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. What's your favorite programming language?"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+      {/* Poll Title */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-2">
+          Poll Question
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. What's your favorite programming language?"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Poll Description */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-2">
+          Description (optional)
+        </label>
+        <textarea
+          placeholder="Add more context about this poll..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Poll Options */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-2">Options</label>
+        <div className="space-y-3">
+          {options.map((opt, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder={`Option ${index + 1}`}
+                value={opt}
+                onChange={(e) => handleOptionChange(index, e.target.value)}
+                className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+              {options.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => removeOption(index)}
+                  className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Poll Description */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Description (optional)
-          </label>
-          <textarea
-            placeholder="Add more context about this poll..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Poll Options */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Options
-          </label>
-          <div className="space-y-3">
-            {options.map((opt, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder={`Option ${index + 1}`}
-                  value={opt}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-                {options.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => removeOption(index)}
-                    className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={addOption}
-            className="mt-3 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition"
-          >
-            ➕ Add Option
-          </button>
-        </div>
-
-        {/* Submit Button */}
         <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 px-4 bg-[#0f172b] hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50"
+          type="button"
+          onClick={addOption}
+          className="mt-3 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition"
         >
-          {loading ? "Creating..." : "Create Poll"}
+          ➕ Add Option
         </button>
-      </form>
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-3 px-4 bg-[#0f172b] hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50"
+      >
+        {loading ? "Creating..." : "Create Poll"}
+      </button>
+    </form>
   );
 }

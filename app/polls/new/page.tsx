@@ -1,6 +1,12 @@
 "use client";
 
 import PollForm from "@/components/PollForm";
+/**
+ * NewPollPage
+ * 
+ * Page component that renders the poll creation form at `/polls/new`.
+ * Responsible only for layout and headings; poll logic is handled in `PollForm`.
+ */
 
 
 export default function NewPollPage() {

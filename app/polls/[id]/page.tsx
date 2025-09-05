@@ -1,139 +1,109 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/lib/supabaseClient';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/AuthContext';
-
-interface PollOption {
-  option_text: string;
-}
 
 interface PollData {
   id: string;
   question: string;
-  creator_id: string;
-  poll_options: PollOption[];
+  options: string[];
 }
 
-export default function PollPage() {
-  const { id } = useParams();
-  const router = useRouter();
-  const { user } = useAuth();
-  const [poll, setPoll] = useState<PollData | null>(null);
+// Mock poll data for demonstration
+// This will eventually be replaced by a database query (Supabase).
+const mockPollData: PollData = {
+  id: '123',
+  question: 'What is your favorite programming language?',
+  options: ['JavaScript', 'Python', 'TypeScript', 'Java', 'C++'],
+};
+
+/**
+ * PollPage
+ *
+ * Page component responsible for displaying a single poll and handling user votes.
+ *
+ * Why it’s needed:
+ * - Acts as the main entry point for end-users to interact with an individual poll.
+ * - Demonstrates client-side voting behavior before backend integration.
+ * - Will later connect to Supabase or another backend service for real poll data and vote persistence.
+ *
+ * Assumptions:
+ * - A valid `params.id` is always provided (from Next.js dynamic routing).
+ * - For now, poll data is mocked; in production, poll data would be fetched based on `params.id`.
+ *
+ * Edge cases handled:
+ * - Users cannot vote until they select an option (`Submit Vote` button disabled).
+ * - Users cannot vote more than once in a session (`voted` state enforces thank-you screen).
+ *
+ * Connections:
+ * - Works with the `PollForm` component (which creates polls).
+ * - Future versions will depend on backend services (e.g., Supabase) to fetch poll details and persist votes.
+ */
+export default function PollPage({ params }: { params: { id: string } }) {
   const [voted, setVoted] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPoll = async () => {
-      const { data, error } = await supabase
-        .from("polls")
-        .select("id, question, creator_id, poll_options(option_text)")
-        .eq("id", id)
-        .single();
+  // Extract poll id from route parameters (provided by Next.js).
+  const { id } = params;
 
-      if (error) {
-        console.error("Error fetching poll:", error);
-      } else {
-        setPoll(data as PollData);
-      }
-    };
-
-    fetchPoll();
-  }, [id]);
-
+  /**
+   * handleVote
+   *
+   * Handles user vote submission.
+   * - Logs the chosen option for now (mock behavior).
+   * - Updates local state so the UI transitions to a "thank you" message.
+   *
+   * Why it’s needed:
+   * - Encapsulates vote submission logic in one place.
+   * - Prepares for future backend integration where votes will be saved to the database.
+   */
   const handleVote = () => {
     if (selectedOption) {
-      console.log(`Voted for: ${selectedOption} on poll ${id}`);
+      console.log(`Voted for: ${selectedOption} on poll ${params.id}`);
       setVoted(true);
     }
   };
 
-  const handleDelete = async () => {
-    if (!poll) return;
-
-    const { error } = await supabase.from("polls").delete().eq("id", poll.id);
-    if (error) {
-      console.error("Error deleting poll:", error);
-    } else {
-      router.push("/polls"); // Redirect back to polls list
-    }
-  };
-
-  const handleEdit = () => {
-    if (!poll) return;
-    router.push(`/polls/${poll.id}/edit`);
-  };
-
-  if (!poll) {
-    return <div className="flex justify-center items-center min-h-screen">Loading poll...</div>;
+  // If the user has already voted, show a thank-you screen instead of the poll
+  if (voted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-[400px]">
+          <CardHeader>
+            <CardTitle>Thank you for voting!</CardTitle>
+            <CardDescription>Your vote has been recorded.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>You voted for: {selectedOption}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  const isCreator = user?.id === poll.creator_id;
-
+  // Default UI: display poll question and voting options
   return (
-    <div className="m-0 flex justify-center items-center min-h-[86vh] bg-gray-100 p-6">
-      <Card className="w-full max-w-md shadow-lg rounded-2xl py-10 space-y-4">
-        <CardHeader className="flex flex-row items-start justify-between space-y-0">
-          <div>
-            <CardTitle className="text-2xl font-bold">{poll.question}</CardTitle>
-            <CardDescription>Poll ID: {id}</CardDescription>
-          </div>
-
-          {isCreator && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="border-1 border-slate-400" onClick={handleEdit}>
-                Edit
-              </Button>
-              <Button size="sm" className="border-1 bg-transparent text-destructive border-destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            </div>
-          )}
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-[400px]">
+        <CardHeader>
+          <CardTitle>{mockPollData.question}</CardTitle>
+          <CardDescription>Poll ID: {id}</CardDescription>
         </CardHeader>
-
         <CardContent>
-          {!voted ? (
-            <>
-              <RadioGroup
-                onValueChange={(value) => setSelectedOption(value)}
-                className="space-y-3"
-              >
-                {poll.poll_options.map((option, idx) => (
-                  <div key={idx} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option.option_text} id={option.option_text} />
-                    <Label htmlFor={option.option_text}>{option.option_text}</Label>
-                  </div>
-                ))}
-              </RadioGroup>
-
-              <Button
-                onClick={handleVote}
-                disabled={!selectedOption}
-                className="w-full mt-4"
-              >
-                Submit Vote
-              </Button>
-            </>
-          ) : (
-            <div className="text-center relative">
-              <p className="text-lg font-semibold">Thanks for voting!</p>
-              <p className="text-gray-500 mt-2">
-                You voted for: <span className="font-bold">{selectedOption}</span>
-              </p>
-              <Button
-                onClick={() => router.push('/polls')}
-                variant="outline"
-                className="mt-4"
-              >
-                Back to Polls
-              </Button>
-            </div>
-          )}
+          <RadioGroup onValueChange={setSelectedOption} value={selectedOption || ''}>
+            {mockPollData.options.map((option, index) => (
+              <div key={index} className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value={option} id={`option-${index}`} />
+                <Label htmlFor={`option-${index}`}>{option}</Label>
+              </div>
+            ))}
+          </RadioGroup>
+          <Button onClick={handleVote} className="mt-4 w-full" disabled={!selectedOption}>
+            Submit Vote
+          </Button>
         </CardContent>
       </Card>
     </div>
