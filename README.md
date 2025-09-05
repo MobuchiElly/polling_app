@@ -119,14 +119,25 @@ This schema ensures:
    ```
 
 3. Set up environment variables
-   Create a `.env.local` file with your Supabase credentials:
+
+   Create a `.env.local` file with your Supabase credentials and project base URL:
 
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000
    ```
 
-4. Run the dev server
+   > Replace `http://localhost:3000` with your deployed project URL when running in production.
+
+4. (For testing) Create a `.env.test` file with the following variables:
+
+   ```env
+   TEST_USER_EMAIL=your-test-email@example.com
+   TEST_USER_PASSWORD=your-test-password
+   ```
+
+5. Run the dev server
 
    ```bash
    npm run dev
