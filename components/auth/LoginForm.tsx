@@ -103,7 +103,7 @@ export function LoginForm() {
         return;
       }
       // Redirect to user's polls dashboard after successful login
-      router.push("/polls");
+      //router.push("/polls");
     } catch (error) {
       setError("root", {
         type: "manual",

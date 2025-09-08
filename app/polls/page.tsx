@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import PollCard from "@/components/PollCard";
 import { Button } from "@/components/ui/button";
+import PollSkeleton from "@/components/PollSkeleton";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -92,7 +93,6 @@ export default function PollsDashboard() {
         }));
         setPolls(formatted);
       }
-
       setLoading(false);
     };
 
@@ -113,7 +113,11 @@ export default function PollsDashboard() {
 
       {/* Conditional UI states: loading, empty, or polls grid */}
       {loading ? (
-        <p className="text-gray-500">Loading polls...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <PollSkeleton key={i} />
+          ))}
+        </div>
       ) : polls.length === 0 ? (
         <p className="text-gray-500">You haven’t created any polls yet.</p>
       ) : (
