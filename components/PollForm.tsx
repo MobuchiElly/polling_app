@@ -9,13 +9,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // Define the Zod schema for poll creation
-const pollFormSchema = z.object({
-  title: z.string().min(1, "Poll title is required!"),
-  description: z.string().optional(),
-  options: z
-    .array(z.string().min(1, "All poll options are required!"))
-    .min(2, "A poll must have at least 2 options."),
-});
+const pollFormSchema = z
+  .object({
+    title: z.string().trim().min(1, "Poll title is required!"),
+    description: z.string().optional(),
+    options: z
+      .array(z.string().trim().min(1, "All poll options are required!"))
+      .min(2, "A poll must have at least 2 options."),
+  })
+  .superRefine((data, ctx) => {
+    const normalized = data.options.map((o) => o.trim().toLowerCase());
+    if (new Set(normalized).size !== normalized.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["options"],
+        message: "Options must be unique.",
+      });
+    }
+  });
+
 
 type PollFormValues = z.infer<typeof pollFormSchema>;
 
