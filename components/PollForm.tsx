@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,6 +57,7 @@ type PollFormValues = z.infer<typeof pollFormSchema>;
  * - Handles Supabase errors gracefully and displays them to the user.
  */
 export default function PollForm() {
+  const supabase = createClient();
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
