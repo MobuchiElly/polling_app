@@ -4,6 +4,32 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Define the Zod schema for poll creation
+const pollFormSchema = z
+  .object({
+    title: z.string().trim().min(1, "Poll title is required!"),
+    description: z.string().optional(),
+    options: z
+      .array(z.string().trim().min(1, "All poll options are required!"))
+      .min(2, "A poll must have at least 2 options."),
+  })
+  .superRefine((data, ctx) => {
+    const normalized = data.options.map((o) => o.trim().toLowerCase());
+    if (new Set(normalized).size !== normalized.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["options"],
+        message: "Options must be unique.",
+      });
+    }
+  });
+
+
+type PollFormValues = z.infer<typeof pollFormSchema>;
 
 /**
  * PollForm Component
@@ -33,11 +59,19 @@ import { useAuth } from "@/lib/AuthContext";
 export default function PollForm() {
   const { user } = useAuth();
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [options, setOptions] = useState<string[]>(["", ""]); // Always start with 2 options
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // Keep for general Supabase errors
+
+  const { register, handleSubmit, control, watch, formState: { errors }, setValue, getValues } = useForm<PollFormValues>({
+    resolver: zodResolver(pollFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      options: ["", ""], // Always start with 2 options
+    },
+  });
+
+  const options = watch("options"); // Watch options to re-render when they change
 
   /**
    * Effect: Redirect unauthenticated users
@@ -62,9 +96,10 @@ export default function PollForm() {
    * @param value - New string value entered by the user
    */
   const handleOptionChange = (index: number, value: string) => {
-    const updated = [...options];
+    const currentOptions = getValues("options");
+    const updated = [...currentOptions];
     updated[index] = value;
-    setOptions(updated);
+    setValue("options", updated, { shouldValidate: true });
   };
 
   /**
@@ -76,7 +111,7 @@ export default function PollForm() {
    * Assumption: The database supports any reasonable number of options.
    */
   const addOption = () => {
-    setOptions([...options, ""]);
+    setValue("options", [...options, ""], { shouldValidate: true });
   };
 
   /**
@@ -91,7 +126,7 @@ export default function PollForm() {
    */
   const removeOption = (index: number) => {
     if (options.length <= 2) return; // Enforce minimum of 2 options
-    setOptions(options.filter((_, i) => i !== index));
+    setValue("options", options.filter((_, i) => i !== index), { shouldValidate: true });
   };
 
   /**
@@ -113,24 +148,9 @@ export default function PollForm() {
    *
    * @param e - React form submission event
    */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: PollFormValues) => {
     setLoading(true);
     setError(""); // Clear previous errors
-
-    // Validate poll title
-    if (!title.trim()) {
-      setError("Poll title is required!");
-      setLoading(false);
-      return;
-    }
-
-    // Validate poll options
-    if (options.some((opt) => !opt.trim())) {
-      setError("All poll options are required!");
-      setLoading(false);
-      return;
-    }
 
     // Double-check user auth
     if (!user) {
@@ -143,14 +163,14 @@ export default function PollForm() {
       // 1. Insert poll
       const { data: poll, error: pollError } = await supabase
         .from("polls")
-        .insert([{ question: title, creator_id: user.id }])
+        .insert([{ question: data.title, creator_id: user.id }])
         .select()
         .single();
 
       if (pollError) throw pollError;
 
       // 2. Insert poll options (linked via poll.id foreign key)
-      const formattedOptions = options.map((text) => ({
+      const formattedOptions = data.options.map((text) => ({
         option_text: text,
         poll_id: poll.id,
       }));
@@ -174,7 +194,7 @@ export default function PollForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Error Banner */}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
@@ -243,10 +263,12 @@ export default function PollForm() {
         <input
           type="text"
           placeholder="e.g. What's your favorite programming language?"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          {...register("title")}
           className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
+        {errors.title && (
+          <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+        )}
       </div>
 
       {/* Poll Description */}
@@ -256,8 +278,7 @@ export default function PollForm() {
         </label>
         <textarea
           placeholder="Add more context about this poll..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          {...register("description")}
           className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -295,6 +316,9 @@ export default function PollForm() {
         >
           ➕ Add Option
         </button>
+        {errors.options && (
+          <p className="text-red-500 text-sm mt-1">{errors.options.message}</p>
+        )}
       </div>
 
       {/* Submit Button */}
