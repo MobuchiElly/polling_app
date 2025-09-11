@@ -1,5 +1,5 @@
 import { useAuth } from '../AuthContext';
-import { supabase } from '../supabaseClient';
+import { createClient } from '@/lib/supabase/client';
 
 /**
  * Custom Hook: useUserClient
@@ -30,6 +30,7 @@ import { supabase } from '../supabaseClient';
  * - Relies on `AuthContext` (for user state) and `supabaseClient` (for queries).
  */
 export const useUserClient = () => {
+  const supabase = createClient();
   const { user } = useAuth();
 
   /**

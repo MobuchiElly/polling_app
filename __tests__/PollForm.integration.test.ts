@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.test" });
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 
 const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL!;
 const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD!;

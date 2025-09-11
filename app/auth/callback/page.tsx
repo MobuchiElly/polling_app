@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 
 /**
  * AuthCallback Component
@@ -37,6 +37,7 @@ import { supabase } from "@/lib/supabaseClient";
  * - Works in conjunction with `LoginForm` and `RegisterForm` which initiate authentication.
  */
 export default function AuthCallback() {
+  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
