@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+// REMOVE: import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,6 +57,7 @@ type PollFormValues = z.infer<typeof pollFormSchema>;
  * - Handles Supabase errors gracefully and displays them to the user.
  */
 export default function PollForm() {
+  // REMOVE: const supabase = createClient();
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -160,29 +161,22 @@ export default function PollForm() {
     }
 
     try {
-      // 1. Insert poll
-      const { data: poll, error: pollError } = await supabase
-        .from("polls")
-        .insert([{ question: data.title, creator_id: user.id }])
-        .select()
-        .single();
+      const response = await fetch("/api/polls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-      if (pollError) throw pollError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create poll.");
+      }
 
-      // 2. Insert poll options (linked via poll.id foreign key)
-      const formattedOptions = data.options.map((text) => ({
-        option_text: text,
-        poll_id: poll.id,
-      }));
-
-      const { error: optionsError } = await supabase
-        .from("poll_options")
-        .insert(formattedOptions);
-
-      if (optionsError) throw optionsError;
-
+      const result = await response.json();
       // 3. Redirect to the newly created poll page
-      router.push(`/polls/${poll.id}`);
+      router.push(`/polls/${result.pollId}`);
     } catch (err: any) {
       console.error("Error creating poll:", err);
       setError(

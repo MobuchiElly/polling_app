@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase } from './supabaseClient'
+import { createClient } from '@/lib/supabase/client'
 
 /**
  * AuthContextType - Defines the shape of the authentication context.
@@ -49,6 +49,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
  * - Consumed by `useAuth` hook in functional components like `LoginForm` or `RegisterForm`.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const supabase = createClient();
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
