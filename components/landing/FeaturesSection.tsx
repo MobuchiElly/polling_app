@@ -1,5 +1,5 @@
 import { FeatureCard } from "./FeatureCard";
-import { Lightbulb, Share2, BarChart2 } from "lucide-react"; // You might need to install lucide-react: npm install lucide-react
+import { Lightbulb, Share2, BarChart2 } from "lucide-react";
 
 export function FeaturesSection() {
   return (
