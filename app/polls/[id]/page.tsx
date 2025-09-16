@@ -1,73 +1,136 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation'; // Import useRouter
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'; // Import Supabase client
 
 interface PollData {
   id: string;
   question: string;
-  options: string[];
+  poll_options: { id: string; option_text: string }[]; // Update poll_options type
+  creator_id: string; // Add creator_id
 }
 
-// Mock poll data for demonstration
-// This will eventually be replaced by a database query (Supabase).
-const mockPollData: PollData = {
-  id: '123',
-  question: 'What is your favorite programming language?',
-  options: ['JavaScript', 'Python', 'TypeScript', 'Java', 'C++'],
-};
-
-/**
- * PollPage
- *
- * Page component responsible for displaying a single poll and handling user votes.
- *
- * Why it’s needed:
- * - Acts as the main entry point for end-users to interact with an individual poll.
- * - Demonstrates client-side voting behavior before backend integration.
- * - Will later connect to Supabase or another backend service for real poll data and vote persistence.
- *
- * Assumptions:
- * - A valid `params.id` is always provided (from Next.js dynamic routing).
- * - For now, poll data is mocked; in production, poll data would be fetched based on `params.id`.
- *
- * Edge cases handled:
- * - Users cannot vote until they select an option (`Submit Vote` button disabled).
- * - Users cannot vote more than once in a session (`voted` state enforces thank-you screen).
- *
- * Connections:
- * - Works with the `PollForm` component (which creates polls).
- * - Future versions will depend on backend services (e.g., Supabase) to fetch poll details and persist votes.
- */
 export default function PollPage({ params }: { params: { id: string } }) {
   const [voted, setVoted] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [poll, setPoll] = useState<PollData | null>(null); // State for poll data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+  const [isCreator, setIsCreator] = useState(false); // State to check if current user is creator
 
-  // Extract poll id from route parameters (provided by Next.js).
-  const { id } = params;
+  const {id} = useParams();
+  const router = useRouter();
+  const supabase = createClientComponentClient(); // Initialize Supabase client
 
-  /**
-   * handleVote
-   *
-   * Handles user vote submission.
-   * - Logs the chosen option for now (mock behavior).
-   * - Updates local state so the UI transitions to a "thank you" message.
-   *
-   * Why it’s needed:
-   * - Encapsulates vote submission logic in one place.
-   * - Prepares for future backend integration where votes will be saved to the database.
-   */
-  const handleVote = () => {
-    if (selectedOption) {
-      console.log(`Voted for: ${selectedOption} on poll ${params.id}`);
-      setVoted(true);
+  useEffect(() => {
+    async function fetchPollAndUser() {
+      try {
+        // Fetch poll data
+        const { data: pollData, error: pollError } = await supabase
+          .from('polls')
+          .select('*, poll_options(*)') // Select poll and its options
+          .eq('id', id)
+          .single();
+
+        if (pollError) {
+          throw new Error(pollError.message);
+        }
+
+        if (pollData) {
+          setPoll(pollData);
+
+          // Check if current user is the creator
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && user.id === pollData.creator_id) {
+            setIsCreator(true);
+          }
+        }
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPollAndUser();
+  }, [id, supabase]);
+
+  const handleVote = async () => {
+    if (selectedOption && poll) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const voterId = user ? user.id : null;
+
+        const { error: voteError } = await supabase.from('votes').insert([
+          {
+            poll_id: poll.id,
+            option_id: selectedOption, // Assuming selectedOption is the option_id
+            voter_id: voterId,
+          },
+        ]);
+
+        if (voteError) {
+          throw new Error(voteError.message);
+        }
+
+        console.log(`Voted for: ${selectedOption} on poll ${params.id}`);
+        setVoted(true);
+      } catch (err: any) {
+        setError(err.message);
+      }
     }
   };
 
-  // If the user has already voted, show a thank-you screen instead of the poll
+  const handleDeletePoll = async () => {
+    if (confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
+      try {
+        const response = await fetch(`/api/polls/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete poll');
+        }
+
+        alert('Poll deleted successfully!');
+        router.push('/'); // Redirect to home page after deletion
+      } catch (err: any) {
+        setError(err.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading poll...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-500">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!poll) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Poll not found.</p>
+      </div>
+    );
+  }
+
   if (voted) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -77,27 +140,25 @@ export default function PollPage({ params }: { params: { id: string } }) {
             <CardDescription>Your vote has been recorded.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>You voted for: {selectedOption}</p>
+            <p>You voted for: {poll.poll_options.find(opt => opt.id === selectedOption)?.option_text}</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Default UI: display poll question and voting options
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>{mockPollData.question}</CardTitle>
-          <CardDescription>Poll ID: {id}</CardDescription>
+          <CardTitle>{poll.question}</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup onValueChange={setSelectedOption} value={selectedOption || ''}>
-            {mockPollData.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`}>{option}</Label>
+            {poll.poll_options.map((option) => (
+              <div key={option.id} className="flex items-center space-x-2 mb-2">
+                <RadioGroupItem value={option.id} id={`option-${option.id}`} />
+                <Label htmlFor={`option-${option.id}`}>{option.option_text}</Label>
               </div>
             ))}
           </RadioGroup>
