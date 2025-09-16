@@ -1,0 +1,212 @@
+diff --git a/components/landing/CallToActionSection.tsx b/components/landing/CallToActionSection.tsx
+index c0012fa..9a3b55b 100644
+--- a/components/landing/CallToActionSection.tsx
++++ b/components/landing/CallToActionSection.tsx
+@@ -2,21 +2,21 @@ import { Button } from "@/components/ui/button";
+ import Link from "next/link";
+ 
+ export function CallToActionSection() {
+-  return (
+-    <section className="py-16 px-4 md:px-8 bg-primary text-primary-foreground text-center">
+-      <div className="max-w-4xl mx-auto">
+-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+-          Ready to Create Your First Poll?
+-        </h2>
+-        <p className="text-lg mb-8">
+-          Join thousands of users who are already gathering valuable insights with our easy-to-use polling app.
+-        </p>
+-        <Link href="/auth/register" passHref>
+-          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+-            Get Started - It's Free!
+-          </Button>
+-        </Link>
+-      </div>
+-    </section>
+-  );
++    return (
++        <section className="py-16 px-4 md:px-8 bg-primary text-primary-foreground text-center">
++            <div className="max-w-4xl mx-auto">
++                <h2 className="text-3xl md:text-4xl font-bold mb-4">
++                    Ready to Create Your First Poll?
++                </h2>
++                <p className="text-lg mb-8">
++                    Join thousands of users who are already gathering valuable insights with our easy-to-use polling app.
++                </p>
++                <Link href="/auth/register" passHref>
++                    <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
++                        Get Started - It's Free!
++                    </Button>
++                </Link>
++            </div>
++        </section>
++    );
+ }
+\ No newline at end of file
+diff --git a/components/landing/HeroSection.tsx b/components/landing/HeroSection.tsx
+index 5e684e6..af4cada 100644
+--- a/components/landing/HeroSection.tsx
++++ b/components/landing/HeroSection.tsx
+@@ -2,34 +2,34 @@ import { Button } from "@/components/ui/button";
+ import Image from "next/image";
+ 
+ export function HeroSection() {
+-  return (
+-    <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white overflow-hidden">
+-      {/* Background Image/Visual Element Placeholder */}
+-      <div className="absolute inset-0 z-0">
+-        <Image
+-          src="/hero-bg.webp"
+-          alt="Hero Background"
+-          layout="fill"
+-          objectFit="cover"
+-          quality={100}
+-          className="opacity-30"
+-        />
+-      </div>
++    return (
++        <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white overflow-hidden">
++            {/* Background Image/Visual Element Placeholder */}
++            <div className="absolute inset-0 z-0">
++                <Image
++                    src="/hero-bg.webp"
++                    alt="Hero Background"
++                    layout="fill"
++                    objectFit="cover"
++                    quality={100}
++                    className="opacity-30"
++                />
++            </div>
+ 
+-      <div className="relative z-10 px-4 md:px-8 max-w-3xl">
+-        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
+-          Easily Create and Share Polls
+-        </h1>
+-        <p className="text-lg md:text-xl mb-8 opacity-90">
+-          Quickly gather opinions and view real-time results with unique links and QR codes.
+-        </p>
+-        <Button
+-          size="lg"
+-          className="bg-white text-blue-600 hover:bg-gray-100 hover:text-blue-700 text-lg px-8 py-3 rounded-full shadow-lg transition-all duration-300"
+-        >
+-          Create Your First Poll Now
+-        </Button>
+-      </div>
+-    </section>
+-  );
++            <div className="relative z-10 px-4 md:px-8 max-w-3xl">
++                <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
++                    Easily Create and Share Polls
++                </h1>
++                <p className="text-lg md:text-xl mb-8 opacity-90">
++                    Quickly gather opinions and view real-time results with unique links and QR codes.
++                </p>
++                <Button
++                    size="lg"
++                    className="bg-white text-blue-600 hover:bg-gray-100 hover:text-blue-700 text-lg px-8 py-3 rounded-full shadow-lg transition-all duration-300"
++                >
++                    Create Your First Poll Now
++                </Button>
++            </div>
++        </section>
++    );
+ }
+\ No newline at end of file
+diff --git a/components/landing/HowItWorksSection.tsx b/components/landing/HowItWorksSection.tsx
+index 9ba5549..ca99bbd 100644
+--- a/components/landing/HowItWorksSection.tsx
++++ b/components/landing/HowItWorksSection.tsx
+@@ -1,5 +1,26 @@
+ import { StepCard } from "./StepCard";
+ 
++const steps = [
++  {
++    stepNumber: 1,
++    title: "Create Your Poll",
++    description:
++      "Easily design your poll with custom questions and multiple answer options.",
++  },
++  {
++    stepNumber: 2,
++    title: "Share with Your Audience",
++    description:
++      "Distribute your poll via a unique link or QR code to gather responses.",
++  },
++  {
++    stepNumber: 3,
++    title: "Analyze Results in Real-time",
++    description:
++      "View live updates and detailed analytics as votes come in.",
++  },
++];
++
+ export function HowItWorksSection() {
+   return (
+     <section className="py-16 px-4 md:px-8 bg-white">
+@@ -11,22 +32,10 @@ export function HowItWorksSection() {
+           Get started in three simple steps to create, share, and analyze your polls.
+         </p>
+ 
+-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+-          <StepCard
+-            stepNumber={1}
+-            title="Create Your Poll"
+-            description="Easily design your poll with custom questions and multiple answer options."
+-          />
+-          <StepCard
+-            stepNumber={2}
+-            title="Share with Your Audience"
+-            description="Distribute your poll via a unique link or QR code to gather responses."
+-          />
+-          <StepCard
+-            stepNumber={3}
+-            title="Analyze Results in Real-time"
+-            description="View live updates and detailed analytics as votes come in."
+-          />
++        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
++          {steps.map((step) => (
++            <StepCard key={step.stepNumber} {...step} />
++          ))}
+         </div>
+       </div>
+     </section>
+diff --git a/components/landing/StepCard.tsx b/components/landing/StepCard.tsx
+index 399fc47..7cba651 100644
+--- a/components/landing/StepCard.tsx
++++ b/components/landing/StepCard.tsx
+@@ -1,21 +1,21 @@
+ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+ 
+ interface StepCardProps {
+-  stepNumber: number;
+-  title: string;
+-  description: string;
++    stepNumber: number;
++    title: string;
++    description: string;
+ }
+ 
+ export function StepCard({ stepNumber, title, description }: StepCardProps) {
+-  return (
+-    <Card className="flex flex-col items-center text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+-      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold mb-4">
+-        {stepNumber}
+-      </div>
+-      <CardHeader>
+-        <CardTitle className="text-xl font-semibold mb-2">{title}</CardTitle>
+-        <CardDescription className="text-gray-600">{description}</CardDescription>
+-      </CardHeader>
+-    </Card>
+-  );
++    return (
++        <Card className="flex flex-col items-center text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
++            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground text-xl font-bold mb-4">
++                {stepNumber}
++            </div>
++            <CardHeader>
++                <CardTitle className="text-xl font-semibold mb-2">{title}</CardTitle>
++                <CardDescription className="text-gray-600">{description}</CardDescription>
++            </CardHeader>
++        </Card>
++    );
+ }
+\ No newline at end of file
