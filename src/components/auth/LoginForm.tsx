@@ -4,17 +4,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-import { useAuth } from "@/lib/AuthContext";
 import { loginSchema } from "@/schemas/auth";
 import { LoginFormData } from "@/types/auth";
-import { useRouter } from "next/navigation";
-
+import { useSearchParams, useRouter } from "next/navigation";
+import axios from "axios";
 /**
  * LoginForm Component
  * 
@@ -50,17 +47,10 @@ import { useRouter } from "next/navigation";
  * - UI components (`Button`, `Input`, `Label`, `Alert`) standardize styling.
  */
 export function LoginForm() {
-  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
-
-  // Loading state during authentication requests
   const [isLoading, setIsLoading] = useState(false);
-
-  // Auth context for login and user info
-  const { signIn, user } = useAuth();
-
-  // Next.js router for navigation after successful login
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Setup react-hook-form with Zod validation schema
   const {
@@ -92,22 +82,20 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const { session, error } = await signIn(data.email, data.password);
-      if (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An unexpected error occurred";
-        setError("root", {
-          type: "manual",
-          message: errorMessage,
-        });
-        return;
+      const {email, password} = data;
+      const res = await axios.post("/api/auth/login", {
+        email, password
+      });
+      if (res.status === 200){
+        const redirectUrl = searchParams.get("redirectedFrom") || "/polls";
+        router.push(redirectUrl);
       }
-      // Redirect to user's polls dashboard after successful login
-      router.push("/polls");
     } catch (error) {
+      console.log("err:", error);
+      const errorMessage = axios.isAxiosError(error) ? error?.response?.data.error : "An unexpected error occurred";
       setError("root", {
-        type: "manual",
-        message: "An unexpected error occurred. Please try again later."
+      type: "manual",
+      message: errorMessage,
       });
     } finally {
       setIsLoading(false);

@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'; // Import Supabase client
+import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import axios from "axios";
 
 interface PollData {
   id: string;
@@ -19,38 +20,20 @@ interface PollData {
 export default function PollPage({ params }: { params: { id: string } }) {
   const [voted, setVoted] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [poll, setPoll] = useState<PollData | null>(null); // State for poll data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
-  const [isCreator, setIsCreator] = useState(false); // State to check if current user is creator
+  const [poll, setPoll] = useState<PollData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreator, setIsCreator] = useState(true);
 
   const {id} = useParams();
   const router = useRouter();
-  const supabase = createClientComponentClient(); // Initialize Supabase client
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     async function fetchPollAndUser() {
       try {
-        // Fetch poll data
-        const { data: pollData, error: pollError } = await supabase
-          .from('polls')
-          .select('*, poll_options(*)') // Select poll and its options
-          .eq('id', id)
-          .single();
-
-        if (pollError) {
-          throw new Error(pollError.message);
-        }
-
-        if (pollData) {
-          setPoll(pollData);
-
-          // Check if current user is the creator
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user && user.id === pollData.creator_id) {
-            setIsCreator(true);
-          }
-        }
+        const res = await axios.get("/api/polls");
+        
       } catch (err: any) {
         setError(err.message);
       } finally {
