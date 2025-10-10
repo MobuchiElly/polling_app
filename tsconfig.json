@@ -24,7 +24,7 @@
     ],
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     }
   },
@@ -34,8 +34,12 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "lib/supabaseClient.env",
-    "app/polls/[id]/page.env"
-, "__tests__/integration/PollFomr", "__tests__/PollForm.unit.test.tsx", "__tests__/PollForm.integration.test.ts"  ],
+    "app/polls/[id]/page.env",
+    "__tests__/integration/PollFomr",
+    "__tests__/PollForm.unit.test.tsx",
+    "__tests__/PollForm.integration.test.ts",
+    "src/lib/AuthContext.tsx"
+  ],
   "exclude": [
     "node_modules"
   ]

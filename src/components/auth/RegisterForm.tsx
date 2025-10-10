@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-
+import axios, { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -45,10 +45,8 @@ import { RegisterFormValues } from "@/types/auth";
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signUp } = useAuth();
   const router = useRouter();
 
-  // Initialize react-hook-form with validation using Zod schema
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -82,21 +80,19 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormValues) {
     setIsLoading(true);
     try {
-      const { error } = await signUp(values.email, values.password);
-      if (error) {
-        // Alert user of registration failure
-        alert(`Registration failed: ${error.message}`);
-        return;
-      }
-      // Successful registration: prompt user to check email confirmation
-      alert("Registration successful! Please check your email for a confirmation link.");
-      // Optionally redirect to login page after registration
-      router.push("/auth/login");
+      const { email, password, confirmPassword } = values;
+      const res = await axios.post("/api/auth/register", {
+        email, password
+      });
+     if (res.status === 200){
+        router.push("/auth/login");
+     }
     } catch (error) {
-      // Handle any unexpected errors gracefully
-      alert("An unexpected error occurred during registration.");
+      const errorMessage = axios.isAxiosError(error) ?  error?.response?.data.error : "Error: Registration unsuccessfull."
+      alert(errorMessage);
+      console.log("error: ", errorMessage);
     } finally {
-      setIsLoading(false); // Ensure loading state is cleared
+      setIsLoading(false);
     }
   }
 

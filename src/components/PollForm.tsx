@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// REMOVE: import { createClient } from "@/lib/supabase/client";
+import axios, {AxiosError} from "axios";
 import { useAuth } from "@/lib/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,11 +68,11 @@ export default function PollForm() {
     defaultValues: {
       title: "",
       description: "",
-      options: ["", ""], // Always start with 2 options
+      options: ["", ""]
     },
   });
 
-  const options = watch("options"); // Watch options to re-render when they change
+  const options = watch("options"); 
 
   /**
    * Effect: Redirect unauthenticated users
