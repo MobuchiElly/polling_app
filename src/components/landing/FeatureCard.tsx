@@ -9,12 +9,12 @@ interface FeatureCardProps {
 
 export function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <Card className="flex flex-col items-center text-center py-8 px-4 shadow-lg hover:shadow-xl transition-shadow duration-300 ">
-      <CardHeader className="w-full flex gap-4">
+    <Card className="flex flex-col items-center text-center py-12 px-4 md:px-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <CardHeader className="w-full flex gap-3 px-0">
         <div className="text-4xl text-blue-600">{icon}</div>
         <CardTitle className="text-xl font-bold">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="">
+      <CardContent className="px-0">
         <p className="text-gray-600">{description}</p>
       </CardContent>
     </Card>

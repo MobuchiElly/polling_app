@@ -16,7 +16,7 @@ export function StepCard({ stepNumber, title, description }: StepCardProps) {
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
     >
-      <Card className="relative flex flex-col items-center text-center p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 bg-white group">
+      <Card className="relative flex flex-col items-center p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 bg-white group">
         <div className="absolute -top-6 w-14 h-14 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl font-bold shadow-md">
           {stepNumber}
         </div>

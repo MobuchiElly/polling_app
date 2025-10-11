@@ -46,12 +46,6 @@ export function HowItWorksSection() {
           {steps.map((step, index) => (
             <StepCard key={index} {...step} />
           ))}
-
-          {/* connecting arrows for medium and above */}
-          <div className="hidden md:flex absolute inset-0 justify-between items-center pointer-events-none">
-            <ArrowRight className="w-8 h-8 text-gray-300 translate-x-[130%]" />
-            <ArrowRight className="w-8 h-8 text-gray-300 translate-x-[130%]" />
-          </div>
         </div>
       </div>
     </section>
