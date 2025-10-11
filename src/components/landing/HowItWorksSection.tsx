@@ -1,43 +1,59 @@
-import { StepCard } from "./StepCard";
+"use client";
+// HowItWorksSection.tsx
+import { StepCard } from "./StepCard"
+import { motion } from "framer-motion"
+import { ArrowRight } from "lucide-react"
 
 const steps = [
   {
     stepNumber: 1,
     title: "Create Your Poll",
     description:
-      "Easily design your poll with custom questions and multiple answer options.",
+      "Design your poll with custom questions and multiple answer options in seconds.",
   },
   {
     stepNumber: 2,
-    title: "Share with Your Audience",
+    title: "Share Instantly",
     description:
-      "Distribute your poll via a unique link or QR code to gather responses.",
+      "Send your poll via link or QR code to your audience and start collecting responses.",
   },
   {
     stepNumber: 3,
-    title: "Analyze Results in Real-time",
+    title: "Analyze Insights",
     description:
-      "View live updates and detailed analytics as votes come in.",
+      "Track real-time responses and analytics to understand trends at a glance.",
   },
-];
+]
 
 export function HowItWorksSection() {
   return (
-    <section className="py-16 px-4 md:px-8 bg-white">
+    <section className="relative py-20 px-6 md:px-12 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          How Our Polling App Works
-        </h2>
-        <p className="text-lg text-gray-600 mb-12">
-          Get started in three simple steps to create, share, and analyze your polls.
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-4xl md:text-5xl font-bold mb-6 text-gray-900"
+        >
+          How It Works
+        </motion.h2>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-16">
+          Just three easy steps to create, share, and analyze your polls effortlessly.
         </p>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {steps.map((step) => (
-            <StepCard key={step.stepNumber} {...step} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
+          {steps.map((step, index) => (
+            <StepCard key={index} {...step} />
           ))}
+
+          {/* connecting arrows for medium and above */}
+          <div className="hidden md:flex absolute inset-0 justify-between items-center pointer-events-none">
+            <ArrowRight className="w-8 h-8 text-gray-300 translate-x-[130%]" />
+            <ArrowRight className="w-8 h-8 text-gray-300 translate-x-[130%]" />
+          </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

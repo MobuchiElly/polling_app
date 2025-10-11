@@ -25,7 +25,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 mb-10">
               {children}
             </main>
             <Footer />
