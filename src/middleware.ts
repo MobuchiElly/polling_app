@@ -3,12 +3,13 @@ import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "./lib/supabase/server";
 
-export async function middleware(req: NextRequest){
+export async function middleware(){
+    //req: NextRequest
     const res = NextResponse.next();
-    const cookieStore = cookies();
+    // const cookieStore = await cookies();
 
-    const supabase = await createClient();
-    const { data:{session} } = await supabase.auth.getSession();
+    // const supabase = await createClient();
+    // const { data:{session} } = await supabase.auth.getSession();
     
     // if(req.nextUrl.pathname.startsWith("/dashboard")){
     //     if(!session){
