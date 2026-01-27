@@ -30,7 +30,8 @@ export async function POST(
       success: true,
       message: "request successful"
     },{status: 201})
-  } catch(err:any){
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  } catch(error){
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

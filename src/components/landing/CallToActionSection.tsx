@@ -15,7 +15,7 @@ export function CallToActionSection() {
                     </p>
                     <Link href="/auth/register" passHref>
                         <Button size="lg" className="bg-primary-foreground text-primary hover:scale-105 hover:bg-primary-foreground/90 font-semibold text-lg px-10 py-6 rounded-lg shadow-md hover:shadow-lg hover:bg-primary-foreground/90 transition-all duration-300">
-                            Get Started - It's Free!
+                            Get Started - It&apos;s Free!
                         </Button>
                     </Link>
                 </div>

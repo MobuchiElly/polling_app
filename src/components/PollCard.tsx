@@ -2,7 +2,14 @@ import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function PollCard({ poll }: { poll: any }) {
+interface Poll {
+  id: string;
+  question: string;
+  created_at: string;
+  vote_count: number;
+}
+
+export default function PollCard({ poll }: { poll: Poll }) {
   return (
     <Card>
       <CardContent className="p-4">

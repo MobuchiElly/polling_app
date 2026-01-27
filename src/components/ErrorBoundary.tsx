@@ -28,7 +28,7 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex flex-col items-center justify-center h-screen bg-red-100 text-red-800">
           <h1 className="text-4xl font-bold mb-4">Oops! Something went wrong.</h1>
-          <p className="text-lg">We're sorry, but an unexpected error occurred.</p>
+          <p className="text-lg">We are sorry, but an unexpected error occurred.</p>
           <p className="text-sm mt-2">Please try refreshing the page or contact support if the issue persists.</p>
         </div>
       );

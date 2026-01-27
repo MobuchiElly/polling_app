@@ -154,10 +154,9 @@ export default function PollForm() {
       const result = await response.json();
       const pollId = result.pollId;
       //router.push(`/dashboard/polls/${pollId}`);
-    } catch (err: any) {
-      console.error("Error creating poll:", err);
+    } catch (err) {
       setError(
-        err.message || "Something went wrong creating the poll. Please try again."
+        err instanceof Error ? err.message : "Internal server error"
       );
     } finally {
       setLoading(false);

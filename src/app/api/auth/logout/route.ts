@@ -16,9 +16,10 @@ export async function POST() {
       { message: "Successfully logged out" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

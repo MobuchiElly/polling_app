@@ -32,9 +32,10 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch (err: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

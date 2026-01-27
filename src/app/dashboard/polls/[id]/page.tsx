@@ -38,8 +38,9 @@ export default function PollPage({ params }: { params: { id: string } }) {
         const data = await res.json();
         // console.log("res:", data);
         setPoll(data.poll);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Internal server error";
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -47,7 +48,6 @@ export default function PollPage({ params }: { params: { id: string } }) {
 
     fetchPollAndUser();
   }, [id, supabase]);
-console.log("hello");
 
   const handleVote = async () => {
     if (selectedOption && poll) {
@@ -69,8 +69,9 @@ console.log("hello");
 
         console.log(`Voted for: ${selectedOption} on poll ${params.id}`);
         setVoted(true);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Internal server error";
+        setError(message);
       }
     }
   };
@@ -89,8 +90,9 @@ console.log("hello");
 
         alert('Poll deleted successfully!');
         router.push('/'); // Redirect to home page after deletion
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Internal server error";
+        setError(message);
       }
     }
   };

@@ -1,6 +1,16 @@
 import { cookies } from "next/headers";
 import PollCard from "@/components/PollCard";
 
+interface Poll {
+  id: string;
+  question: string;
+  created_at: string;
+  vote_count: number;
+  votes: [{
+    option: string;
+    count: number;
+  }]
+}
 interface PollsListProps {
   filter?: 'user' | 'all';
 }
@@ -25,8 +35,8 @@ export default async function PollsList({ filter = 'user' }: PollsListProps) {
     const data = await res.json();
     polls = data.polls;
     console.log("polls:", polls);
-  } catch(err: any) {
-    const errorMessage = err.message || "error fetching data";
+  } catch(err) {
+    const errorMessage = err instanceof Error ? err.message : "Internal server error";
     return <p className="text-red-500">Could not fetch polls.</p>;
   }
 
@@ -42,7 +52,7 @@ export default async function PollsList({ filter = 'user' }: PollsListProps) {
     );
   }
 
-  const formattedPolls = polls.map((poll: any) => ({
+  const formattedPolls = polls.map((poll: Poll) => ({
     ...poll,
     vote_count: poll.votes?.[0]?.count || 0,
   }));

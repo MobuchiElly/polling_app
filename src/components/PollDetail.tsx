@@ -34,8 +34,8 @@ const PollDetail = ({ poll }: { poll: PollData }) => {
       } else {
         setError('Unable to process your vote')
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Internal server error")
     }
   }
 

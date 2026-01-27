@@ -31,7 +31,8 @@ export async function GET(
       poll: pollData
     },{status: 200})
   } catch(err:any){
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -88,8 +89,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: 'Poll deleted successfully' }, { status: 200 });
-  } catch (error: any) {
-    console.error('API route error:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

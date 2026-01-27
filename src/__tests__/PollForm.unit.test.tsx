@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import PollForm from "../components/PollForm";
+import { supabase } from "@/lib/supabaseClient";
 
 // Mock the supabase client
 jest.mock("../lib/supabaseClient", () => ({
@@ -67,8 +68,7 @@ describe("PollForm", () => {
       fireEvent.click(createButton);
     });
 
-    // supabase mock was called
-    const { supabase } = require("../lib/supabaseClient");
+    
     expect(supabase.from).toHaveBeenCalledWith("polls");
   });
 });
