@@ -59,7 +59,7 @@ export default async function PollsList({ filter = 'user' }: PollsListProps) {
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {formattedPolls.length > 0 && formattedPolls.map((poll:any) => (
+      {formattedPolls.length > 0 && formattedPolls.map((poll: Poll) => (
         <PollCard key={poll.id} poll={poll} />
       ))}
     </div>
