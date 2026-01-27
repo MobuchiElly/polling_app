@@ -1,14 +1,17 @@
-import {cookies} from "next/headers";
+import { cookies } from "next/headers";
 import PollCard from "@/components/PollCard";
 
+interface PollsListProps {
+  filter?: 'user' | 'all';
+}
 
-export default async function PollsList() {
+export default async function PollsList({ filter = 'user' }: PollsListProps) {
   const cookieHeader = await cookies();
   const cookieHeaderStr = cookieHeader.toString();
   let polls = [];
 
-  try{
-    const res = await fetch("http://localhost:3000/api/polls", {
+  try {
+    const res = await fetch(`http://localhost:3000/api/polls?filter=${filter}`, {
         method: "GET",
         headers: {
           Cookie: cookieHeaderStr
@@ -21,20 +24,29 @@ export default async function PollsList() {
     }
     const data = await res.json();
     polls = data.polls;
-  }catch(err: any){
+    console.log("polls:", polls);
+  } catch(err: any) {
     const errorMessage = err.message || "error fetching data";
     return <p className="text-red-500">Could not fetch polls.</p>;
   }
 
   if (polls.length === 0) {
-    return <p className="text-gray-500">You haven’t created any polls yet.</p>;
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">
+          {filter === 'user' 
+            ? "You haven't created any polls yet." 
+            : "No polls available at the moment."}
+        </p>
+      </div>
+    );
   }
 
   const formattedPolls = polls.map((poll: any) => ({
     ...poll,
     vote_count: poll.votes?.[0]?.count || 0,
   }));
-  console.log("formattedPolls:", formattedPolls);
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {formattedPolls.length > 0 && formattedPolls.map((poll:any) => (

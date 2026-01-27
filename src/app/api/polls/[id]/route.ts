@@ -1,13 +1,46 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import polls from "../../../../lib/mock_data/polls.json";
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { id } = await params;
+  try {
+    // const supabase = await createClient();
+
+    // const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // if (userError) return NextResponse.json({ error: "User authentication required" }, { status: 401 });
+
+    // const { data:pollData, error: pollError } = await supabase
+    //   .from("polls")
+    //   .select("*, poll_options(*)")
+    //   .eq("id", id)
+    //   .maybeSingle();
+
+    // if (pollError) return NextResponse.json({ "error": pollError }, { status: 500 });
+    // if (!pollData) return NextResponse.json({ "error": "Poll not found" }, { status: 404 });
+    const pollData = polls.find((poll) => poll.id == id)
+    console.log("poll id:", id);
+    console.log("poll:", pollData);
+    return NextResponse.json({
+      success: true,
+      message: "request successful",
+      poll: pollData
+    },{status: 200})
+  } catch(err:any){
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+  }
+}
 
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createRouteHandlerClient({ cookies });
-  const { id } = params;
+  const supabase = await createClient();
+  const { id } = await params;
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
