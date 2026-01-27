@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
+import polls from "../../../lib/mock_data/polls.json";
 
-/**
- * Handles POST requests to create a new note.
- *
- * @param {Request} request - The incoming request object containing the note data.
- * @returns {Promise<NextResponse>} A JSON response with the created note or an error message.
- */
 export async function POST(request: Request) {
     const { title: question, description, options } = await request.json();
     const supabase = await createClient();
@@ -48,30 +43,33 @@ export async function POST(request: Request) {
     );
 }
 
-/**
- * Handles GET requests to retrieve all notes for the authenticated user.
- *
- * @param {Request} request - The incoming request object.
- * @returns {Promise<NextResponse>} A JSON response with an array of notes or an error message.
- */
 export async function GET(request: Request) {
-    const supabase = await createClient();
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData?.user) {
-        return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
-    }
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') || 'user';
+    
+    // const supabase = await createClient();
+    // const { data: userData, error: userError } = await supabase.auth.getUser();
+    
+    // if (userError || !userData?.user) {
+    //     return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+    // }
 
-    const { data: polls, error: pollError } = await supabase
-      .from('polls')
-      .select('*, poll_options(*)')
-      .eq('creator_id', userData.user.id);
-    if (pollError) {
-        console.error('Error fetching notes:', pollError);
-        return NextResponse.json({ error: pollError.message }, { status: 500 });
-    }
+    // let query = supabase.from('polls').select('*, poll_options(*), votes(count)');
+    // // Filter by user's polls only if filter is 'user'
+    // if (filter === 'user') {
+    //     query = query.eq('creator_id', userData.user.id);
+    // }
+    
+    // const { data: polls, error: pollError } = await query;
+    // if (pollError) {
+    //     console.error('Error fetching polls:', pollError);
+    //     return NextResponse.json({ error: pollError.message }, { status: 500 });
+    // }
+    //Temporarily fetch mock data for now
+
     return NextResponse.json({
         success: true,
-        message: "Request Successfull",
+        message: "Request Successful",
         polls
     }, 
     { status: 200 });

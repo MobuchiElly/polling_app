@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import axios from "axios";
+
 
 interface PollData {
   id: string;
@@ -32,8 +32,12 @@ export default function PollPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchPollAndUser() {
       try {
-        const res = await axios.get("/api/polls");
-        
+        const res = await fetch(`/api/polls/${id}`, {
+          method: "GET"
+        });
+        const data = await res.json();
+        // console.log("res:", data);
+        setPoll(data.poll);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -43,6 +47,7 @@ export default function PollPage({ params }: { params: { id: string } }) {
 
     fetchPollAndUser();
   }, [id, supabase]);
+console.log("hello");
 
   const handleVote = async () => {
     if (selectedOption && poll) {

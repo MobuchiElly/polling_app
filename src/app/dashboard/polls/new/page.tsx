@@ -1,5 +1,3 @@
-"use client";
-
 import PollForm from "@/components/PollForm";
 /**
  * NewPollPage

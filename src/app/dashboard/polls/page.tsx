@@ -7,9 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function PollsDashboard() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
+  //Temporarily hard code user
+  const user = "John Doe";
 
   return (
     <div className="max-w-7xl mx-auto p-6">

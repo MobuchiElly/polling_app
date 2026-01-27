@@ -57,11 +57,9 @@ type PollFormValues = z.infer<typeof pollFormSchema>;
  * - Handles Supabase errors gracefully and displays them to the user.
  */
 export default function PollForm() {
-  // REMOVE: const supabase = createClient();
-  const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // Keep for general Supabase errors
+  const [error, setError] = useState("");
 
   const { register, handleSubmit, control, watch, formState: { errors }, setValue, getValues } = useForm<PollFormValues>({
     resolver: zodResolver(pollFormSchema),
@@ -73,18 +71,6 @@ export default function PollForm() {
   });
 
   const options = watch("options"); 
-
-  /**
-   * Effect: Redirect unauthenticated users
-   *
-   * Why: Poll creation should only be possible for logged-in users.
-   * This avoids invalid data (polls without an owner).
-   */
-  useEffect(() => {
-    if (!user) {
-      return router.push("/auth/login");
-    }
-  }, [user, router]);
 
   /**
    * handleOptionChange
@@ -151,15 +137,7 @@ export default function PollForm() {
    */
   const onSubmit = async (data: PollFormValues) => {
     setLoading(true);
-    setError(""); // Clear previous errors
-
-    // Double-check user auth
-    if (!user) {
-      setError("You must be logged in to create a poll.");
-      setLoading(false);
-      return;
-    }
-
+    setError("");
     try {
       const response = await fetch("/api/polls", {
         method: "POST",
@@ -173,10 +151,9 @@ export default function PollForm() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to create poll.");
       }
-
       const result = await response.json();
-      // 3. Redirect to the newly created poll page
-      router.push(`/polls/${result.pollId}`);
+      const pollId = result.pollId;
+      //router.push(`/dashboard/polls/${pollId}`);
     } catch (err: any) {
       console.error("Error creating poll:", err);
       setError(
