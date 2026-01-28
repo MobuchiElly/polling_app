@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/LoginForm";
 import Link from "next/link";
-
+import {Suspense} from "react";
 /**
  * LoginPage Component
  *
@@ -47,7 +47,9 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           {/* Login form handles authentication */}
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
           {/* Link to registration page for users without accounts */}
           <div className="mt-4 text-center text-sm">
             Don’t have an account?{" "}
