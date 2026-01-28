@@ -37,6 +37,7 @@ export default async function PollsList({ filter = 'user' }: PollsListProps) {
     console.log("polls:", polls);
   } catch(err) {
     const errorMessage = err instanceof Error ? err.message : "Internal server error";
+    console.error(errorMessage);
     return <p className="text-red-500">Could not fetch polls.</p>;
   }
 

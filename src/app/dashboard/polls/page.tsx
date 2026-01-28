@@ -6,7 +6,7 @@ import PollsList from "@/components/PollsList";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function PollsDashboard() {
-  const supabase = await createClient();
+  //const supabase = await createClient();
   // const {
   //   data: { user },
   // } = await supabase.auth.getUser();

@@ -7,7 +7,7 @@ import { Lightbulb, Share2, BarChart2 } from "lucide-react";
 export function FeaturesSection() {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  //const [scrollPosition, setScrollPosition] = useState(0);
 
 
  useEffect(() => {
@@ -95,7 +95,7 @@ export function FeaturesSection() {
       description: "Gain instant insights with live updates and comprehensive visualizations of your poll results.",
     },
   ]
-  const duplicatedFeatures = [...features, ...features];
+
 
   return (
     <section className="mt-24 px-4 md:px-8">
@@ -113,7 +113,7 @@ export function FeaturesSection() {
           onMouseEnter={() => setIsHovered(true)} 
           onMouseLeave={() => setIsHovered(false)}>
           {
-            features.map((feature, index) => (
+            features.map((feature) => (
               <FeatureCard
                 key={feature.id}
                 icon={feature.icon}

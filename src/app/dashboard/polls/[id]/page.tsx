@@ -23,7 +23,7 @@ export default function PollPage({ params }: { params: { id: string } }) {
   const [poll, setPoll] = useState<PollData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isCreator, setIsCreator] = useState(true);
+  // const [isCreator, setIsCreator] = useState(true);
 
   const {id} = useParams();
   const router = useRouter();
@@ -76,26 +76,26 @@ export default function PollPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleDeletePoll = async () => {
-    if (confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
-      try {
-        const response = await fetch(`/api/polls/${id}`, {
-          method: 'DELETE',
-        });
+  // const handleDeletePoll = async () => {
+  //   if (confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
+  //     try {
+  //       const response = await fetch(`/api/polls/${id}`, {
+  //         method: 'DELETE',
+  //       });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to delete poll');
-        }
+  //       if (!response.ok) {
+  //         const errorData = await response.json();
+  //         throw new Error(errorData.error || 'Failed to delete poll');
+  //       }
 
-        alert('Poll deleted successfully!');
-        router.push('/'); // Redirect to home page after deletion
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Internal server error";
-        setError(message);
-      }
-    }
-  };
+  //       alert('Poll deleted successfully!');
+  //       router.push('/'); // Redirect to home page after deletion
+  //     } catch (err) {
+  //       const message = err instanceof Error ? err.message : "Internal server error";
+  //       setError(message);
+  //     }
+  //   }
+  // };
 
   if (loading) {
     return (

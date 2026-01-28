@@ -11,7 +11,8 @@ const OPTIONS_TABLE = "test_poll_options";
 
 describe("PollForm integration with Supabase (test tables)", () => {
   let pollId: string | null = null;
-  let userId: string | null = null;
+  //let userId: string | null = null;
+  const supabase = createClient();
 
   beforeAll(async () => {
     // Sign in the user before running tests
@@ -21,7 +22,7 @@ describe("PollForm integration with Supabase (test tables)", () => {
     });
 
     if (error) throw error;
-    userId = session.user?.id;
+    //userId = session.user?.id;
   });
 
   afterAll(async () => {

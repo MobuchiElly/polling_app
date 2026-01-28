@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "./lib/supabase/server";
+// import type { NextRequest } from "next/server";
+// import { cookies } from "next/headers";
+// import { createClient } from "./lib/supabase/server";
 
 export async function middleware(){
     //req: NextRequest

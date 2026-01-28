@@ -2,7 +2,6 @@
 // HowItWorksSection.tsx
 import { StepCard } from "./StepCard"
 import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
 
 const steps = [
   {

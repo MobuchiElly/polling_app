@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function POST(
@@ -14,7 +14,7 @@ export async function POST(
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) return NextResponse.json({ error: "User authentication required" }, { status: 401 });
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("votes")
       .insert([{
         poll_id: id,

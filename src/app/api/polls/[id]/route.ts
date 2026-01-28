@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import polls from "../../../../lib/mock_data/polls.json";
 
 export async function GET(
-  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = await params;
@@ -37,7 +36,6 @@ export async function GET(
 }
 
 export async function DELETE(
-  request: Request,
   { params }: { params: { id: string } }
 ) {
   const supabase = await createClient();

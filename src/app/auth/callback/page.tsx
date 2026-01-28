@@ -59,7 +59,7 @@ export default function AuthCallback() {
     };
 
     handleSession();
-  }, [router]);
+  }, [router, supabase]);
 
   return (
     <main className="flex h-screen items-center justify-center bg-background text-foreground">

@@ -5,6 +5,8 @@ import polls from "../../../lib/mock_data/polls.json";
 export async function POST(request: Request) {
     const { title: question, description, options } = await request.json();
     const supabase = await createClient();
+    
+    console.log("description:", description);
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
@@ -46,7 +48,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
     const url = new URL(request.url);
     const filter = url.searchParams.get('filter') || 'user';
-    
+    console.log("filter:", filter);
     // const supabase = await createClient();
     // const { data: userData, error: userError } = await supabase.auth.getUser();
     

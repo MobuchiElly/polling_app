@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email?email=${encodeURIComponent(email)}`
       },
     });
-
+    console.log("registration data:", data);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

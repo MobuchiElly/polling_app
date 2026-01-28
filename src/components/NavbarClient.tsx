@@ -11,7 +11,7 @@ export default function NavbarClient() {
   // const supabase = await createClient();
   // const {data: {user}} = await supabase.auth.getUser();
   //const [userState, setUserState] = useState(user);
-  const [userState, setUserState] = useState("John Doe");
+  //const [userState, setUserState] = useState("John Doe");
   const [userProfileActive, setUserProfileActive] = useState(false);
 
   // const signout = async () => {

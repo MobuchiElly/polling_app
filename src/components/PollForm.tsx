@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios, {AxiosError} from "axios";
-import { useAuth } from "@/lib/AuthContext";
+import { useState } from "react";
+//import { useRouter } from "next/navigation";
+//import axios, {AxiosError} from "axios";
+//import { useAuth } from "@/lib/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -57,7 +57,7 @@ type PollFormValues = z.infer<typeof pollFormSchema>;
  * - Handles Supabase errors gracefully and displays them to the user.
  */
 export default function PollForm() {
-  const router = useRouter();
+  //const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -69,7 +69,7 @@ export default function PollForm() {
       options: ["", ""]
     },
   });
-
+  console.log(control)
   const options = watch("options"); 
 
   /**
@@ -152,7 +152,7 @@ export default function PollForm() {
         throw new Error(errorData.error || "Failed to create poll.");
       }
       const result = await response.json();
-      const pollId = result.pollId;
+      //const pollId = result.pollId;
       //router.push(`/dashboard/polls/${pollId}`);
     } catch (err) {
       setError(
