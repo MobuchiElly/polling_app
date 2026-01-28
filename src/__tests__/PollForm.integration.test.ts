@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.test" });
 import { createClient } from "@/lib/supabase/client";
 
-const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL!;
-const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD!;
+// const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL!;
+// const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD!;
 
 // Test tables
 const POLLS_TABLE = "test_polls";
@@ -14,16 +14,16 @@ describe("PollForm integration with Supabase (test tables)", () => {
   //let userId: string | null = null;
   const supabase = createClient();
 
-  beforeAll(async () => {
-    // Sign in the user before running tests
-    const { data: session, error } = await supabase.auth.signInWithPassword({
-      email: TEST_USER_EMAIL,
-      password: TEST_USER_PASSWORD,
-    });
+  // beforeAll(async () => {
+  //   // Sign in the user before running tests
+  //   const { error } = await supabase.auth.signInWithPassword({
+  //     email: TEST_USER_EMAIL,
+  //     password: TEST_USER_PASSWORD,
+  //   });
 
-    if (error) throw error;
-    //userId = session.user?.id;
-  });
+  //   if (error) throw error;
+  //   //userId = session.user?.id;
+  // });
 
   afterAll(async () => {
     if (pollId) {

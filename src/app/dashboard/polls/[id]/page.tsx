@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 
@@ -26,7 +25,6 @@ export default function PollPage({ params }: { params: { id: string } }) {
   // const [isCreator, setIsCreator] = useState(true);
 
   const {id} = useParams();
-  const router = useRouter();
   const supabase = createClientComponentClient();
 
   useEffect(() => {

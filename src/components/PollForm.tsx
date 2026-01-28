@@ -151,7 +151,7 @@ export default function PollForm() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to create poll.");
       }
-      const result = await response.json();
+      //const result = await response.json();
       //const pollId = result.pollId;
       //router.push(`/dashboard/polls/${pollId}`);
     } catch (err) {

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import PollSkeleton from "@/components/PollSkeleton";
 import PollsList from "@/components/PollsList";
-import { createClient } from "@/lib/supabase/server";
+//import { createClient } from "@/lib/supabase/server";
 
 export default async function PollsDashboard() {
   //const supabase = await createClient();
