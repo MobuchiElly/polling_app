@@ -1,4 +1,4 @@
-import { useAuth } from '../AuthContext.ts';
+import { useAuth } from '../AuthContext';
 import { createClient } from '@/lib/supabase/client';
 
 /**

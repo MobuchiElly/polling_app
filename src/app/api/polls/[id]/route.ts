@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 // import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import polls from "../../../../lib/mock_data/polls.json";
 
 export async function GET(
-  { params }: { params: { id: string } }
+  _request: NextRequest, 
+{ params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   try {
@@ -21,7 +22,8 @@ export async function GET(
 
     // if (pollError) return NextResponse.json({ "error": pollError }, { status: 500 });
     // if (!pollData) return NextResponse.json({ "error": "Poll not found" }, { status: 404 });
-    const pollData = polls.find((poll) => poll.id == id)
+    const pollData = polls.find((poll) => poll.id == id);
+    if (!pollData) return NextResponse.json({ "error": "Poll not found" }, { status: 404 });
     console.log("poll id:", id);
     console.log("poll:", pollData);
     return NextResponse.json({
@@ -36,7 +38,8 @@ export async function GET(
 }
 
 export async function DELETE(
-  { params }: { params: { id: string } }
+  _request: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient();
   const { id } = await params;

@@ -14,7 +14,7 @@ export function FeaturesSection() {
   if (!containerRef.current || isHovered) return;
   
     const container = containerRef.current;
-    const scrollLeft = Math.floor(container);
+    const scrollLeft = Math.floor(container.scrollLeft);
     //console.log("1 container.scrollLeft:", container.scrollLeft);
   const step = 1; // small value = smoother motion
 
