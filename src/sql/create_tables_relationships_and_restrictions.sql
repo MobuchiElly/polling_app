@@ -1,11 +1,16 @@
 -- 1. Users table (Supabase already provides `auth.users`)
 -- We’ll reference it using user_id = auth.uid()
 
+-- drop table if exists votes cascade;
+-- drop table if exists poll_options cascade;
+-- drop table if exists polls cascade;
+
 -- 2. Polls table
 create table polls (
   id uuid primary key default gen_random_uuid(),
   creator_id uuid references auth.users(id) on delete cascade,
-  question text not null,
+  title text not null,
+  description text,
   created_at timestamp with time zone default now()
 );
 

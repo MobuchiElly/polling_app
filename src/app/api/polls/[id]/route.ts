@@ -1,7 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
-// import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import polls from "../../../../lib/mock_data/polls.json";
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   _request: NextRequest, 
@@ -9,23 +7,21 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    // const supabase = await createClient();
+    const supabase = await createClient();
 
-    // const { data: { user }, error: userError } = await supabase.auth.getUser();
-    // if (userError) return NextResponse.json({ error: "User authentication required" }, { status: 401 });
+    const { data: _userData, error: userError } = await supabase.auth.getUser();
+   
+    if (userError) return NextResponse.json({ error: "User authentication required" }, { status: 401 });
 
-    // const { data:pollData, error: pollError } = await supabase
-    //   .from("polls")
-    //   .select("*, poll_options(*)")
-    //   .eq("id", id)
-    //   .maybeSingle();
+    const { data:pollData, error: pollError } = await supabase
+      .from("polls")
+      .select("*, poll_options(*)")
+      .eq("id", id)
+      .maybeSingle();
 
-    // if (pollError) return NextResponse.json({ "error": pollError }, { status: 500 });
-    // if (!pollData) return NextResponse.json({ "error": "Poll not found" }, { status: 404 });
-    const pollData = polls.find((poll) => poll.id == id);
+    if (pollError) return NextResponse.json({ "error": pollError }, { status: 500 });
     if (!pollData) return NextResponse.json({ "error": "Poll not found" }, { status: 404 });
-    console.log("poll id:", id);
-    console.log("poll:", pollData);
+   
     return NextResponse.json({
       success: true,
       message: "request successful",
@@ -43,55 +39,58 @@ export async function DELETE(
 ) {
   const supabase = await createClient();
   const { id } = await params;
-
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+      return NextResponse.json({ error: error?.message || 'Unauthorized to carry out this request' }, { status: 401 });
     }
-
+    const userId = user.id;
     // First, check if the user is the creator of the poll
     const { data: poll, error: fetchError } = await supabase
       .from('polls')
       .select('creator_id')
       .eq('id', id)
       .single();
-
     if (fetchError || !poll) {
-      console.error('Error fetching poll or poll not found:', fetchError);
-      return NextResponse.json({ error: 'Poll not found or access denied' }, { status: 404 });
+      return NextResponse.json({ error: 'This request could not be completed because the resource cannot be found' }, { status: 404 });
     }
 
-    if (poll.creator_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden: You are not the creator of this poll' }, { status: 403 });
+    if (poll.creator_id !== userId) {
+      return NextResponse.json({ error: 'You are unauthorised to carry out this request' }, { status: 403 });
     }
 
-    // Delete associated poll options first due to foreign key constraint
+    // Delete votes associated with the poll
+    const {error: voteError} = await supabase
+      .from('votes')
+      .delete()
+      .eq('poll_id', id);
+    if(voteError) return NextResponse.json({ error: voteError.message || "Server error" }, { status: 500 });
+
+    // Delete associated poll options
     const { error: optionsError } = await supabase
       .from('poll_options')
       .delete()
       .eq('poll_id', id);
+    if (optionsError) return NextResponse.json({ error: optionsError.message }, { status: 500 });
 
-    if (optionsError) {
-      console.error('Supabase poll options delete error:', optionsError);
-      return NextResponse.json({ error: optionsError.message }, { status: 500 });
-    }
-
-    // Then delete the poll itself
+    // Delete poll
     const { error: pollError } = await supabase
       .from('polls')
       .delete()
       .eq('id', id);
-
-    if (pollError) {
-      console.error('Supabase poll delete error:', pollError);
-      return NextResponse.json({ error: pollError.message }, { status: 500 });
-    }
+    if (pollError) return NextResponse.json({ error: pollError.message }, { status: 500 });
 
     return NextResponse.json({ message: 'Poll deleted successfully' }, { status: 200 });
   } catch (error) {
+    console.error("error:", error);
     const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+// export async function PATCH(_request: NextRequest, 
+//   {_params}: { params: Promise<{_id: string}>}
+// ){
+//   return NextResponse.json({ message: "Tracking"}, {status: 200});
+// }

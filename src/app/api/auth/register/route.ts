@@ -14,14 +14,14 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data: _data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email?email=${encodeURIComponent(email)}`
       },
     });
-    console.log("registration data:", data);
+    
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

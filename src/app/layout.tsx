@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 //import { AuthProvider } from "@/lib/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
-
+import { Toaster } from "react-hot-toast";
+import ClientLayout from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
   title: "PollApp",
@@ -24,11 +23,10 @@ export default function RootLayout({
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <ErrorBoundary>
-            <Navbar />
-            <main className="mt-20 flex-1 mb-10">
+            <ClientLayout>
               {children}
-            </main>
-            <Footer />
+            </ClientLayout>
+            <Toaster />
         </ErrorBoundary>
       </body>
     </html>

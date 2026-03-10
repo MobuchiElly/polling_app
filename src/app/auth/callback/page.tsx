@@ -46,14 +46,10 @@ export default function AuthCallback() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      // Debugging: log the session object
-      console.log("session:", session);
 
       if (session) {
-        // User is authenticated
         router.push("/polls");
       } else {
-        // No session: redirect user to login page to re-authenticate
         router.push("/auth/login");
       }
     };
@@ -67,7 +63,6 @@ export default function AuthCallback() {
         {/* Spinner displayed while session is being verified */}
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
 
-        {/* Informational message for users */}
         <h1 className="text-lg font-medium tracking-tight">
           Processing authentication
         </h1>

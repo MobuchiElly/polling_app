@@ -1,6 +1,6 @@
 import NavbarClient from "./NavbarClient";
 
-export default async function Navbar() {
+export default function Navbar() {
 
   return (
     <nav>

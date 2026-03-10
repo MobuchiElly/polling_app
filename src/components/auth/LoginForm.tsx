@@ -11,7 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { loginSchema } from "@/schemas/auth";
 import { LoginFormData } from "@/types/auth";
 import { useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
+import { toast } from "react-hot-toast";
+
 /**
  * LoginForm Component
  * 
@@ -82,20 +83,27 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const {email, password} = data;
-      const res = await axios.post("/api/auth/login", {
-        email, password
+      const { email, password } = data;
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email, password
+        }),
       });
-      if (res.status === 200){
-        const redirectUrl = searchParams.get("redirectedFrom") || "/polls";
+      if (res.status === 200) {
+        toast.success("Login successful!");
+        const redirectUrl = searchParams.get("redirectedFrom") || "/dashboard";
         router.push(redirectUrl);
       }
     } catch (error) {
-      console.log("err:", error);
-      const errorMessage = axios.isAxiosError(error) ? error?.response?.data.error : "An unexpected error occurred";
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+      toast.error(errorMessage);
       setError("root", {
-      type: "manual",
-      message: errorMessage,
+        type: "manual",
+        message: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -104,14 +112,12 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Display root-level error messages */}
       {errors.root && (
         <Alert variant="destructive">
           <AlertDescription>{errors.root.message}</AlertDescription>
         </Alert>
       )}
 
-      {/* Email Field */}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -131,7 +137,6 @@ export function LoginForm() {
         )}
       </div>
 
-      {/* Password Field with visibility toggle */}
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <div className="relative">
@@ -145,7 +150,7 @@ export function LoginForm() {
             aria-invalid={errors.password ? "true" : "false"}
             aria-describedby={errors.password ? "password-error" : undefined}
           />
-          {/* Toggle password visibility button */}
+      
           <Button
             type="button"
             variant="ghost"
@@ -164,7 +169,6 @@ export function LoginForm() {
         )}
       </div>
 
-      {/* Submit Button */}
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>

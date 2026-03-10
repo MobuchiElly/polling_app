@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,9 +14,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-// import { useAuth } from "@/lib/AuthContext";
 import { registerSchema } from "@/schemas/auth";
 import { RegisterFormValues } from "@/types/auth";
+import { toast } from "react-hot-toast";
 
 /**
  * RegisterForm Component
@@ -81,16 +80,22 @@ export function RegisterForm() {
     setIsLoading(true);
     try {
       const { email, password } = values;
-      const res = await axios.post("/api/auth/register", {
-        email, password
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email, password
+        }),
       });
-     if (res.status === 200){
+      if (res.status === 201) {
+        toast.success("Registration successful!");
         router.push("/auth/login");
-     }
+      }
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error) ?  error?.response?.data.error : "Error: Registration unsuccessfull."
-      alert(errorMessage);
-      console.log("error: ", errorMessage);
+      const errorMessage = error instanceof Error ? error.message : "Error: Registration unsuccessful."
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +104,6 @@ export function RegisterForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Email Field */}
         <FormField
           control={form.control}
           name="email"
@@ -119,7 +123,6 @@ export function RegisterForm() {
           )}
         />
 
-        {/* Password Field */}
         <FormField
           control={form.control}
           name="password"
@@ -134,7 +137,7 @@ export function RegisterForm() {
                     disabled={isLoading}
                     {...field}
                   />
-                  {/* Toggle password visibility */}
+
                   <Button
                     type="button"
                     variant="ghost"
@@ -152,7 +155,6 @@ export function RegisterForm() {
           )}
         />
 
-        {/* Confirm Password Field */}
         <FormField
           control={form.control}
           name="confirmPassword"
@@ -183,8 +185,6 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-
-        {/* Submit Button */}
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </Button>

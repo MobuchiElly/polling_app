@@ -29,16 +29,16 @@ export default function NavbarClient() {
   
   return(
         <nav className="fixed top-0 z-50 bg-white/95 w-full">
-          <div className="shadow-md px-6 flex justify-between items-center relative">
+          <div className="shadow-md px-1 md:px-5 lg:px-6 flex justify-between items-center relative py-4">
             <Link href="/" className="text-xl font-bold text-blue-600">
               <Image
               src="/img/poppoll-nobg.png"
               alt=""
               height="80" width="80" />
             </Link>
-            <div className="flex items-center gap-4">
-              <Link href="/polls" className="hover:text-blue-500">Polls</Link>
-              <Link href="/dashboard/polls/new" className="bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 text-white rounded-lg">Create Poll</Link>
+            <div className="flex items-center gap-4 pr-1 md:pr-3">
+              <Link href="/dashboard" className="hover:text-blue-500">Polls</Link>
+              <Link href="/dashboard" className="hidden md:block bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 text-white rounded-lg">Create Poll</Link>
               <div className="" onClick={() => setUserProfileActive(!userProfileActive) }>
                 <User className="h-7 w-7 hover:scale-105"/>
                 { userProfileActive &&

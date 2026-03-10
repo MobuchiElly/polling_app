@@ -12,19 +12,16 @@ export function FeaturesSection() {
 
  useEffect(() => {
   if (!containerRef.current || isHovered) return;
-  
-    const container = containerRef.current;
-    const scrollLeft = Math.floor(container.scrollLeft);
-    //console.log("1 container.scrollLeft:", container.scrollLeft);
-  const step = 1; // small value = smoother motion
+
+  const container = containerRef.current;
+  const scrollLeft = Math.floor(container.scrollLeft);
+  const step = 1;
 
   const interval = setInterval(() => {
     const loopPoint = container.scrollWidth / 2;
     if (scrollLeft >= loopPoint) {
-      console.log("yes:", container.scrollLeft)
-      container.scrollLeft = 0; // instant jump, no smooth
-    } else { 
-      console.log("no:", container.scrollLeft);
+      container.scrollLeft = 0;
+    } else {
       container.scrollLeft += step;
     }
   }, 16); // ~60fps
