@@ -33,19 +33,14 @@ import Link from "next/link";
  */
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-      {/* Centered card container */}
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          {/* Page title */}
-          <CardTitle className="text-2xl font-bold">Register</CardTitle>
-          {/* Page description */}
+    <div className="flex min-h-screen items-center justify-center md:bg-gray-100">
+      <Card className="w-full md:max-w-md border-none shadow-none md:shadow-md px-4">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold"><span className="text-slate-900">C</span>reate Account</CardTitle>
           <CardDescription>Enter your email below to create your account</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Registration form handles user creation */}
           <RegisterForm />
-          {/* Link to login page for users who already have accounts */}
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/auth/login" className="underline">

@@ -185,7 +185,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-gradient-to-tr from-blue-900 to-purple-800 py-5" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </Button>
       </form>
