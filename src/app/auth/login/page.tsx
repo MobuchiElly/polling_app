@@ -34,12 +34,12 @@ import {Suspense} from "react";
  */
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen items-center justify-center lg:bg-gray-100">
       {/* Centered card container */}
-      <Card className="w-full max-w-md">
+      <Card className="w-full md:max-w-md flex justify-center px-4 border-none shadow-none lg:shadow-md">
         <CardHeader className="space-y-1">
           {/* Page title */}
-          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+          <CardTitle className="text-2xl text-black font-bold text-center"><span className="text-purple-600 lg:text-black text-3xl">W</span>elcome Back</CardTitle>
           {/* Page description */}
           <CardDescription className="text-center">
             Enter your credentials to access your account
