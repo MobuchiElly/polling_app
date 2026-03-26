@@ -75,7 +75,7 @@ export default function VerifyEmailPage() {
         </CardHeader>
         <CardContent className="text-center">
           {verificationStatus === 'loading' && (
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500" />
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-700" />
           )}
           {verificationStatus === 'failed' && errorMessage && (
             <p className="text-red-500 mb-4">{errorMessage}</p>

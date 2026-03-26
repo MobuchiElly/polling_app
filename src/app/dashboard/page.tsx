@@ -9,25 +9,26 @@ import { ShareModal } from '@/components/share-modal';
 import { PollResults } from '@/components/poll-results';
 import { CreatePollModal } from '@/components/create-poll-modal';
 import { toast } from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
 
 type OptionProps = {
-    id: string;
-    option_text: string;
-    votes: number;   
+  id: string;
+  option_text: string;
+  votes: number;
 }
 type PollProps = {
-    id: string;
-    title: string;
-    description: string;
-    options: OptionProps[];
-    totalVotes: number,
-    isOwned: boolean
-    createdAt: string,
-    creator: {
-      id: string,
-      name: string
-    }
-    createdBy: string
+  id: string;
+  title: string;
+  description: string;
+  options: OptionProps[];
+  totalVotes: number,
+  isOwned: boolean
+  createdAt: string,
+  creator: {
+    id: string,
+    name: string
+  }
+  createdBy: string
 }
 
 export default function Dashboard() {
@@ -38,8 +39,10 @@ export default function Dashboard() {
     null
   );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
+  const [loading, setLoading] = useState(false);  
+  const searchParams = useSearchParams();
+  const createNewPoll = searchParams.get("new");
+
   const handleShare = (pollId: string) => {
     const poll = polls.find((p) => p.id === pollId);
     if (poll) {
@@ -69,7 +72,7 @@ export default function Dashboard() {
         }
       });
       const response = await res.json();
-      if (!res.ok){
+      if (!res.ok) {
         toast.error(response.error || "Failed to delete poll");
         return;
       }
@@ -103,8 +106,8 @@ export default function Dashboard() {
         })
       });
       const newPoll = await res.json();
-      return res.ok ? { success: true, message: "Poll creation successfull" } : { success: false, message: "Poll creation failed" };
       setPollsCreated([newPoll?.poll, ...polls]);
+      return res.ok ? { success: true, message: "Poll creation successfull" } : { success: false, message: "Poll creation failed" };
     } catch (error) {
       console.error("error:", error);
     } finally {
@@ -112,41 +115,46 @@ export default function Dashboard() {
     }
   };
 
-
   useEffect(() => {
-    const fetchUserCreatedPolls = async () => {
+    const fetchPolls = async () => {
       setLoading(true);
-      try {
-        const res = await fetch("/api/polls");
-        const resData = await res.json();
-        if (res.ok) setPollsCreated(resData.polls);
-        setLoading(false);
-      } catch (error) {
-        console.error("error:", error);
-        setLoading(false);
+
+      const fetchJsonHelper = async(url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("An error occurred");
+        return await res.json();
       }
+
+      const [userPollsRes, userVotedpollsRes] = await Promise.allSettled([
+        fetchJsonHelper("/api/polls"),
+        fetchJsonHelper("/api/polls?voted=true")
+      ]);
+      
+      if (userPollsRes.status === "fulfilled") {
+        setPollsCreated(userPollsRes.value.polls);
+      } else {
+
+      }
+      if (userVotedpollsRes.status === "fulfilled") {
+        setPollsVoted(userVotedpollsRes.value.polls);
+      } else {
+
+      }
+      setLoading(false);
     }
-    fetchUserCreatedPolls();
+    fetchPolls();
   }, []);
 
   useEffect(() => {
-    const fetchUserVotedPolls = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/polls?voted=true");
-        const resData = await res.json();
-        if (res.ok) setPollsVoted(resData.polls);
-        setLoading(false);
-      } catch (error) {
-        console.error("error:", error);
-        setLoading(false);
-      }
-    }
-    fetchUserVotedPolls();
-  }, []);
+    if(createNewPoll) setIsCreateModalOpen(true);
+  }, [createNewPoll]);
 
-  if (loading){
-    return <div className="flex justify-center pt-24">Loading...</div>
+  if (loading) {
+    return <div className="fixed inset-0 min-h-screen flex items-center justify-center z-60 bg-white/50">
+      <div className="h-16 w-16 border-4 border-blue-500 rounded-full border-t-0 animate-spin flex items-center justify-center">
+        <div className="h-10 w-10 border-4 border-blue-300 rounded-full border-b-0 animate-spin"></div>
+      </div>
+    </div>
   }
 
   return (

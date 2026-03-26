@@ -30,7 +30,7 @@ export function ShareModal({
   const [copied, setCopied] = useState(false);
 
   // Generate a unique share link
-  const shareLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/poll/${pollId}`;
+  const shareLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/polls/${pollId}`;
   const qrRef = useRef<HTMLDivElement>(null);
 
   const handleCopyLink = () => {

@@ -48,7 +48,7 @@ export default function AuthCallback() {
 
 
       if (session) {
-        router.push("/polls");
+        router.push("/dashboard");
       } else {
         router.push("/auth/login");
       }
@@ -60,9 +60,7 @@ export default function AuthCallback() {
   return (
     <main className="flex h-screen items-center justify-center bg-background text-foreground">
       <div className="flex flex-col items-center space-y-4 text-center">
-        {/* Spinner displayed while session is being verified */}
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
-
         <h1 className="text-lg font-medium tracking-tight">
           Processing authentication
         </h1>

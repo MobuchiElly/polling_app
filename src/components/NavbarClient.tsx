@@ -38,11 +38,11 @@ export default function NavbarClient() {
             </Link>
             <div className="flex items-center gap-4 pr-1 md:pr-3">
               <Link href="/dashboard" className="hover:text-blue-500">Polls</Link>
-              <Link href="/dashboard" className="hidden md:block bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 text-white rounded-lg">Create Poll</Link>
+              <Link href="/dashboard?new=true" className="hidden md:block bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 text-white rounded-lg">Create Poll</Link>
               <div className="" onClick={() => setUserProfileActive(!userProfileActive) }>
                 <User className="h-7 w-7 hover:scale-105"/>
                 { userProfileActive &&
-                  <div className="absolute bg-white/85 rounded-lg top-18 right-0 z-50 py-6 pl-4 pr-6 space-y-2">
+                  <div className="absolute bg-black/50 rounded-lg top-26 right-0 z-50 py-6 pl-4 pr-6 space-y-2">
                     <button className="cursor-pointer hover:scale-105 text-left font-bold w-full bg-white pl-4 py-2 rounded-md text-purple-900">
                       <Link href="/dashboard">Dashboard</Link>
                     </button>

@@ -13,7 +13,7 @@ export function CallToActionSection() {
                     <p className="text-lg mb-10 text-primary-foreground">
                         Join thousands of users who are already gathering valuable insights with our easy-to-use polling app.
                     </p>
-                    <Link href="/auth/register" passHref>
+                    <Link href="/dashboard" passHref>
                         <Button size="lg" className="bg-primary-foreground text-blue-600 hover:scale-105 hover:bg-primary-foreground/90 font-bold text-xl px-10 py-6 rounded-lg shadow-md hover:shadow-lg hover:bg-primary-foreground/90 transition-all duration-300">
                             Get Started - It&apos;s Free!
                         </Button>
