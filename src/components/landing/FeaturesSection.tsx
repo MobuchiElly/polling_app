@@ -7,7 +7,6 @@ import { Lightbulb, Share2, BarChart2 } from "lucide-react";
 export function FeaturesSection() {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  //const [scrollPosition, setScrollPosition] = useState(0);
 
 
  useEffect(() => {
@@ -29,31 +28,7 @@ export function FeaturesSection() {
   return () => clearInterval(interval);
   }, [isHovered]);
 
-
-  // useEffect(() => {
-  //   if (!containerRef.current) return;
-
-  //   const interval = setInterval(() => {
-  //     if (containerRef.current){  
-  //         const maxScroll = containerRef.current?.scrollWidth - containerRef.current?.clientWidth;
-  //         setScrollPosition((prev) => {
-  //           const nextPosition = prev + 300;
-  //           return nextPosition >= maxScroll ? 0 : nextPosition
-  //         })
-  //       }
-  //     }, 2000);
-  //     return () => clearInterval(interval);
-  // }, [isHovered]);
-
-  // useEffect(() => {
-  //   if(containerRef.current){
-  //     containerRef.current.scrollTo({
-  //       left: scrollPosition,
-  //       behavior: "smooth"
-  //     })
-  //   }
-  // }, [scrollPosition]);
-
+  
   const features = [
     {
       id: 1,
@@ -95,7 +70,7 @@ export function FeaturesSection() {
 
 
   return (
-    <section className="mt-24 px-4 md:px-8">
+    <section className="mt-24 px-2 md:px-8">
       <div className="max-w-sm md:max-w-5xl lg:max-w-6xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           Empower Your Decisions with Our Key Features
